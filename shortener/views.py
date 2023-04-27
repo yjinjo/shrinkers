@@ -1,12 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from shortener.forms import RegisterForm
+from shortener.forms import RegisterForm, LoginForm
 from shortener.models import Users
 
 
@@ -58,33 +57,37 @@ def register(request):
 
 
 def login_view(request):
-    msg = None
     is_ok = False
     if request.method == "POST":
-        form = AuthenticationForm(request, request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get("username")
+            email = form.cleaned_data.get("email")
             raw_password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=raw_password)
-            if user:
-                login(request, user)
-                is_ok = True
-        else:
+            remember_me = form.cleaned_data.get("remember_me")
             msg = "올바른 유저ID와 패스워드를 입력하세요."
-    else:
-        form = AuthenticationForm()
+            try:
+                user = Users.objects.get(email=email)
+            except Users.DoesNotExist:
+                msg = "올바른 유저ID와 패스워드를 입력하세요."
+            else:
+                if user.check_password(raw_password):
+                    msg = None
+                    login(request, user)
+                    is_ok = True
+                    request.session["remember_me"] = remember_me
 
-    for visible in form.visible_fields():
-        visible.field.widget.attrs["placeholder"] = (
-            "유저ID" if visible.name == "username" else "패스워드"
-        )
-        visible.field.widget.attrs["class"] = "form-control"
+                    # if not remember_me:
+                    #     request.session.set_expirey(0)
+    else:
+        msg = None
+        form = LoginForm()
+    print("REMEMBER_ME: ", request.session.get("remember_me"))
     return render(request, "login.html", {"form": form, "msg": msg, "is_ok": is_ok})
 
 
 def logout_view(request):
     logout(request)
-    return redirect("index")
+    return redirect("login")
 
 
 @login_required
