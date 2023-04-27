@@ -2,7 +2,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
-from shortener.views import index, get_user, register, login_view, logout_view
+from shortener.views import (
+    index,
+    get_user,
+    register,
+    login_view,
+    logout_view,
+    list_view,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -10,6 +17,7 @@ urlpatterns = [
     path("register", register, name="register"),
     path("login", login_view, name="login"),
     path("logout", logout_view, name="logout"),
+    path("list", list_view, name="list_view"),
     path("get_user/<int:user_id>", get_user),
 ]
 

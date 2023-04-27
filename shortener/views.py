@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -17,7 +19,6 @@ def index(request):
 
 @csrf_exempt
 def get_user(request, user_id):
-    print(user_id)
     if request.method == "GET":
         abc = request.GET.get("abc")
         xyz = request.GET.get("xyz")
@@ -61,7 +62,6 @@ def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, request.POST)
         msg = "가입되어 있지 않거나 로그인 정보가 잘못 되었습니다."
-        print(form.is_valid)
         if form.is_valid():
             username = form.cleaned_data.get("username")
             raw_password = form.cleaned_data.get("password")
@@ -78,3 +78,13 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("index")
+
+
+@login_required
+def list_view(request):
+    page = int(request.GET.get("p", 1))
+    users = Users.objects.all().order_by("-id")
+    paginator = Paginator(users, 10)
+    users = paginator.get_page(page)
+
+    return render(request, "boards.html", {"users": users})
