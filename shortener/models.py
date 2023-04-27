@@ -10,4 +10,4 @@ class PayPlan(models.Model):
 
 
 class Users(AbstractUser):
-    pay_plan = models.ForeignKey(PayPlan, on_delete=models.DO_NOTHING)
+    pay_plan = models.ForeignKey(PayPlan, on_delete=models.DO_NOTHING, null=True)
