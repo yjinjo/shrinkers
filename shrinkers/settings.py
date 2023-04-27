@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+AUTH_USER_MODEL = "shortener.Users"
 INSTALLED_APPS = [
     # django apps
     "django.contrib.admin",
