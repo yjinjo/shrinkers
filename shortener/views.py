@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from shortener.models import Users
 
 
-# Create your views here.
 def index(request):
     user = Users.objects.filter(username="admin").first()
     email = user.email if user else "Anonymous User!"
