@@ -1,6 +1,7 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from shortener.forms import RegisterForm
@@ -54,3 +55,26 @@ def register(request):
     else:
         form = RegisterForm()
         return render(request, "register.html", {"form": form})
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, request.POST)
+        msg = "가입되어 있지 않거나 로그인 정보가 잘못 되었습니다."
+        print(form.is_valid)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            raw_password = form.cleaned_data.get("password")
+            user = authenticate(username=username, password=raw_password)
+            if user:
+                msg = "로그인 성공"
+                login(request, user)
+        return render(request, "login.html", {"form": form, "msg": msg})
+    else:
+        form = AuthenticationForm()
+        return render(request, "login.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("index")
