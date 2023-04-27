@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
@@ -11,10 +11,11 @@ from shortener.models import Users
 
 
 def index(request):
-    user = Users.objects.filter(username="admin").first()
+    user = Users.objects.filter(id=request.user.id).first()
     email = user.email if user else "Anonymous User!"
-
-    return render(request, "base.html", {"welcome_msg": f"Hello {email}"})
+    if not request.user.is_authenticated:
+        email = "Anonymous User!"
+    return render(request, "base.html", {"welcome_msg": "Hello there!"})
 
 
 @csrf_exempt
@@ -36,9 +37,7 @@ def get_user(request, user_id):
         if username:
             user = Users.objects.filter(pk=user_id).update(username=username)
 
-        return JsonResponse(
-            status=201, data=dict(msg="You just reached with Post Method!"), safe=False
-        )
+        return JsonResponse(dict(msg="You just reached with Post Method!"))
 
 
 def register(request):
@@ -59,20 +58,28 @@ def register(request):
 
 
 def login_view(request):
+    msg = None
+    is_ok = False
     if request.method == "POST":
         form = AuthenticationForm(request, request.POST)
-        msg = "가입되어 있지 않거나 로그인 정보가 잘못 되었습니다."
         if form.is_valid():
             username = form.cleaned_data.get("username")
             raw_password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=raw_password)
             if user:
-                msg = "로그인 성공"
                 login(request, user)
-        return render(request, "login.html", {"form": form, "msg": msg})
+                is_ok = True
+        else:
+            msg = "올바른 유저ID와 패스워드를 입력하세요."
     else:
         form = AuthenticationForm()
-        return render(request, "login.html", {"form": form})
+
+    for visible in form.visible_fields():
+        visible.field.widget.attrs["placeholder"] = (
+            "유저ID" if visible.name == "username" else "패스워드"
+        )
+        visible.field.widget.attrs["class"] = "form-control"
+    return render(request, "login.html", {"form": form, "msg": msg, "is_ok": is_ok})
 
 
 def logout_view(request):
