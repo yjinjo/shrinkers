@@ -4,5 +4,12 @@
         <meta charset="UTF-8">
         <title>Django</title>
     </head>
-    <body>{{ welcome_msg }}</body>
+    <body>
+        {{ user }}
+        <br>
+        {% for i in params %}
+            {{ i }}
+            <br>
+        {% endfor %}
+    </body>
 </html>
