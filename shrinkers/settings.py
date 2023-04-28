@@ -27,9 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SETTINGS_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ENV = os.environ.get("DJANGO_ENV", "dev")
 
-ALLOWED_HOSTS = []
+
+if ENV == "dev":
+    DEBUG = True
+else:
+    DEBUG = False
+
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -43,11 +49,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # 3rd party apps
-    "debug_toolbar",  # Django Debug Toolbar
-    "django_seed",
     # local apps
     "shortener",
 ]
+
+# if DEBUG:
+#     INSTALLED_APPS += [
+#         "debug_toolbar",
+#         "django_seed",
+#     ]
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -64,8 +74,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
 ]
+
+# if DEBUG:
+#     MIDDLEWARE += [
+#         "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
+#     ]
 
 ROOT_URLCONF = "shrinkers.urls"
 
@@ -94,7 +108,7 @@ WSGI_APPLICATION = "shrinkers.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 

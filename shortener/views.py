@@ -11,13 +11,10 @@ from shortener.models import Users, ShortenedUrls
 
 
 def index(request):
-    user = Users.objects.filter(id=request.user.id).first()
-    email = user.email if user else "Anonymous User!"
-    if not request.user.is_authenticated:
-        email = "Anonymous User!"
-    return render(request, "base.html", {"welcome_msg": "Hello there!"})
+    return render(request, "base.html")
 
 
+@login_required
 def url_list(request):
     get_list = ShortenedUrls.objects.order_by("-created_at").all()
     return render(request, "url_list.html", {"list": get_list})
@@ -133,7 +130,6 @@ def login_view(request):
     else:
         msg = None
         form = LoginForm()
-    print("REMEMBER_ME: ", request.session.get("remember_me"))
     return render(request, "login.html", {"form": form, "msg": msg, "is_ok": is_ok})
 
 
