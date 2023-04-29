@@ -5,12 +5,12 @@ from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
-from shortener.models import Users
 from shortener.forms import RegisterForm, LoginForm
+from shortener.models import Users
 
 
 def index(request):
-    return render(request, "base.html", {"welcome_msg": "Hello There!"})
+    return render(request, "base.html", {"welcome_msg": "Hello FastCampus!"})
 
 
 @csrf_exempt
@@ -19,11 +19,7 @@ def get_user(request, user_id):
         abc = request.GET.get("abc")
         xyz = request.GET.get("xyz")
         user = Users.objects.filter(pk=user_id).first()
-        return render(
-            request,
-            "base.html",
-            {"user": user, "params": [abc, xyz]},
-        )
+        return render(request, "base.html", {"user": user, "params": [abc, xyz]})
     elif request.method == "POST":
         username = request.GET.get("username")
         if username:
