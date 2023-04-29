@@ -1,5 +1,6 @@
-from shortener.models import ShortenedUrls, Users
 from django.db.models import F
+
+from shortener.models import Users
 
 
 def url_count_changer(request, is_increase: bool):
