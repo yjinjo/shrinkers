@@ -37,7 +37,9 @@ class Users(models.Model):
     user = models.OneToOneField(U, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100, null=True)
     url_count = models.IntegerField(default=0)
-    pay_plan = models.ForeignKey(PayPlan, on_delete=models.DO_NOTHING, null=True)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.DO_NOTHING, null=True
+    )
 
 
 class EmailVerification(TimeStampedModel):
