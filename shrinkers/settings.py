@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     # 3rd party apps
     # local apps
     "shortener",
+    "django_user_agents",
 ]
 
 # if DEBUG:
@@ -73,7 +75,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_user_agents.middleware.UserAgentMiddleware",
 ]
+
+GEOIP_PATH = os.path.join(BASE_DIR, "geolite2")
 
 # if DEBUG:
 #     MIDDLEWARE += [
