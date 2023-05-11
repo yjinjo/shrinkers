@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -39,7 +40,6 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-AUTH_USER_MODEL = "shortener.Users"
 INSTALLED_APPS = [
     # django apps
     "django.contrib.admin",
@@ -49,9 +49,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # 3rd party apps
+    "django_user_agents",
+    "rest_framework",
     # local apps
     "shortener",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 20,
+}
 
 # if DEBUG:
 #     INSTALLED_APPS += [
@@ -74,7 +81,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_user_agents.middleware.UserAgentMiddleware",
 ]
+
+GEOIP_PATH = os.path.join(BASE_DIR, "geolite2")
 
 # if DEBUG:
 #     MIDDLEWARE += [
@@ -107,8 +117,13 @@ WSGI_APPLICATION = "shrinkers.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
+        "OPTIONS": {"autocommit": True, "charset": "utf8mb4"},
     }
 }
 
